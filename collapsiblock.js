@@ -33,7 +33,7 @@ Drupal.behaviors.collapsiblock = function (context) {
         $(titleElt.target).hide();
       }
       else {
-        // $.cookie('collapsiblock-' + id, 0, {path: Drupal.settings.jstools.basePath});
+        $.cookie('collapsiblock-' + id, 0, {path: Drupal.settings.jstools.basePath});
       }
     }
   });
