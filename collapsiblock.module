@@ -24,7 +24,7 @@ function collapsiblock_menu() {
     'description' => 'Configuration for collapsible blocks',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('collapsiblock_admin_settings'),
-    'access callbacks' => array('administer site configuration'),
+    'access arguments' => array('administer site configuration'),
   );
 
   return $items;
