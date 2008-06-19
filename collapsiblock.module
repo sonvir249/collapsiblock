@@ -54,7 +54,7 @@ function collapsiblock_load() {
     $path = drupal_get_path('module', 'collapsiblock');
     jstools_add_js($path . '/collapsiblock.js');
     drupal_add_js(drupal_get_path('module', 'jstools') .'/jquery.cookie.js');
-    drupal_add_js(array('collapsiblock' => array('blocks' => variable_get('collapsiblock_settings', array()), 'default_state' => variable_get('collapsiblock_default_state', 1))) + jstools_theme_data('collapsiblock'), 'setting');
+    drupal_add_js(array('collapsiblock' => array('blocks' => variable_get('collapsiblock_settings', array()), 'default_state' => variable_get('collapsiblock_default_state', 1)) + jstools_theme_data('collapsiblock')), 'setting');
     drupal_add_css($path .'/collapsiblock.css');
     $loaded = TRUE;
   }
