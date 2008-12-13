@@ -1,7 +1,9 @@
 // $Id$
 
+Drupal.Collapsiblock = Drupal.Collapsiblock || {};
+
 Drupal.behaviors.collapsiblock = function (context) {
-  var cookieSt = Drupal.parseJson($.cookie('collapsiblock')) || {};
+  var cookieData = Drupal.Collapsiblock.getCookieData();
   var slidetype = Drupal.settings.collapsiblock.slide_type;
   var defaultState = Drupal.settings.collapsiblock.default_state;
   var slidespeed = parseInt(Drupal.settings.collapsiblock.slide_speed);
@@ -21,7 +23,7 @@ Drupal.behaviors.collapsiblock = function (context) {
       $(titleElt)
         .addClass('collapsiblock')
         .click(function () {
-          var st = Drupal.parseJson($.cookie('collapsiblock')) || {};
+          var st = Drupal.Collapsiblock.getCookieData();
           if ($(this).is('.collapsiblockCollapsed')) {
             $(this).removeClass('collapsiblockCollapsed');
             if (slidetype == 1) {
@@ -60,11 +62,18 @@ Drupal.behaviors.collapsiblock = function (context) {
           $.cookie('collapsiblock', cookieString, {path: Drupal.settings.basePath});
         });
       // Leave active blocks uncollapsed. If the block is expanded, do nothing.
-      if (stat ==  4 || (cookieSt[id] == 0 || (stat == 3 && cookieSt[id] == 'undefined')) && !$(this).find('a.active').size()) {
+      if (stat ==  4 || (cookieData[id] == 0 || (stat == 3 && cookieData[id] == 'undefined')) && !$(this).find('a.active').size()) {
         $(titleElt).addClass('collapsiblockCollapsed');
         $(titleElt.target).hide();
       }
     }
   });
 };
+
+Drupal.Collapsiblock.getCookieData = function () {
+  var cookieString = $.cookie('collapsiblock');
+  return cookieString ? Drupal.parseJson(cookieString) : {};
+};
+
+  
 
