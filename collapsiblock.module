@@ -38,8 +38,22 @@ function collapsiblock_admin_settings() {
   $form['collapsiblock_default_state'] = array(
     '#type' => 'radios',
     '#title' => t('Default block collapse behavior'),
-    '#options' => array(1 => t('None.'), 2 => t('Collapsible, expanded by default.'), 3 => t('Collapsible, collapsed by default.')),
+    '#options' => array(1 => t('None.'), 2 => t('Collapsible, expanded by default.'), 3 => t('Collapsible, collapsed by default.'), 4 => t('Collapsible, collapsed all the time.')),
     '#default_value' => variable_get('collapsiblock_default_state', 1),
+  );
+  $form['collapsiblock_slide_type'] = array(
+    '#type' => 'radios',
+    '#title' => t('Default animation type'),
+    '#options' => array(1 => t('Slide'), 2 => t('Fade and slide')),
+    '#description' => t('Slide is the Drupal default while Fade and slide adds a nice fade effect.'),
+    '#default_value' => variable_get('collapsiblock_slide_type', 1),
+  );
+  $form['collapsiblock_slide_speed'] = array(
+    '#type' => 'select',
+    '#title' => t('Animation speed'),
+    '#options' => drupal_map_assoc(array('50', '100', '200', '300', '400', '500', '700', '1000', '1300')),
+    '#description' => t('The animation speed in milliseconds.'),
+    '#default_value' => variable_get('collapsiblock_slide_speed', 200),
   );
   $form = system_settings_form($form);
   return $form;
@@ -54,7 +68,7 @@ function collapsiblock_load() {
     $path = drupal_get_path('module', 'collapsiblock');
     jstools_add_js($path . '/collapsiblock.js');
     drupal_add_js(drupal_get_path('module', 'jstools') .'/jquery.cookie.js');
-    drupal_add_js(array('collapsiblock' => array('blocks' => variable_get('collapsiblock_settings', array()), 'default_state' => variable_get('collapsiblock_default_state', 1)) + jstools_theme_data('collapsiblock')), 'setting');
+    drupal_add_js(array('collapsiblock' => array('blocks' => variable_get('collapsiblock_settings', array()), 'default_state' => variable_get('collapsiblock_default_state', 1), 'slide_type' => variable_get('collapsiblock_slide_type', 1), 'slide_speed' =>  variable_get('collapsiblock_slide_speed', 200)) + jstools_theme_data('collapsiblock')), 'setting');
     drupal_add_css($path .'/collapsiblock.css');
     $loaded = TRUE;
   }
@@ -67,13 +81,13 @@ function collapsiblock_form_alter(&$form, $form_state, $form_id) {
     $form['collapsiblock'] = array(
       '#type' => 'fieldset',
       '#title' => t('Collapsible'),
-      '#collapsible' => true,
+      '#collapsible' => TRUE,
       '#weight' => -5
     );
     $form['collapsiblock']['collapse_type'] = array(
       '#type' => 'radios',
       '#title' => t('Block collapse behavior'),
-      '#options' => array(1 => t('None.'), 2 => t('Collapsible, expanded by default.'), 3 => t('Collapsible, collapsed by default.')),
+      '#options' => array(1 => t('None.'), 2 => t('Collapsible, expanded by default.'), 3 => t('Collapsible, collapsed by default.'), 4 => t('Collapsible, collapsed all the time.')),
       '#default_value' => $settings['block-' . $form['module']['#value'] . '-' . $form['delta']['#value']] ? $settings['block-' . $form['module']['#value'] . '-' . $form['delta']['#value']] : variable_get('collapsiblock_default_state', 1),
     );
   }
