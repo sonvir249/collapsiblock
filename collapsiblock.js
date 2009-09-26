@@ -62,7 +62,7 @@ Drupal.behaviors.collapsiblock = function (context) {
           $.cookie('collapsiblock', cookieString, {path: Drupal.settings.basePath});
         });
       // Leave active blocks uncollapsed. If the block is expanded, do nothing.
-      if (stat ==  4 || (cookieData[id] == 0 || (stat == 3 && cookieData[id] == 'undefined')) && !$(this).find('a.active').size()) {
+      if (stat ==  4 || (cookieData[id] == 0 || (stat == 3 && cookieData[id] == undefined)) && !$(this).find('a.active').size()) {
         $(titleElt).addClass('collapsiblockCollapsed');
         $(titleElt.target).hide();
       }
