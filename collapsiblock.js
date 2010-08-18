@@ -8,9 +8,8 @@ Drupal.behaviors.collapsiblock = function (context) {
   var defaultState = Drupal.settings.collapsiblock.default_state;
   var slidespeed = parseInt(Drupal.settings.collapsiblock.slide_speed);
   $('div.block:not(.collapsiblock-processed)', context).addClass('collapsiblock-processed').each(function () {
-    var selector = Drupal.settings.collapsiblock && Drupal.settings.collapsiblock.titleSelector ? Drupal.settings.collapsiblock.titleSelector : 'h2';
     var id = this.id;
-    var titleElt = $(selector +':first', this);
+    var titleElt = $(':header:first', this).not($('.content :header',this));
     if (titleElt.size()) {
       titleElt = titleElt[0];
       // Status values: 1 = not collapsible, 2 = collapsible and expanded, 3 = collapsible and collapsed, 4 = always collapsed
