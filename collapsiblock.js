@@ -23,46 +23,56 @@ Drupal.behaviors.collapsiblock = function (context) {
 
       titleElt.target = $(this).find(block_content);
       $(titleElt)
-        .addClass('collapsiblock')
-        .click(function () {
-          var st = Drupal.Collapsiblock.getCookieData();
-          if ($(this).is('.collapsiblockCollapsed')) {
-            $(this).removeClass('collapsiblockCollapsed');
-            if (slidetype == 1) {
-              $(this.target).slideDown(slidespeed);
-            }
-            else {
-              $(this.target).animate({height:'show', opacity:'show'}, slidespeed);
-            }
-
-            // Don't save cookie data if the block is always collapsed.
-            if (stat != 4) {
-              st[id] = 1;
-            }
-          } 
-          else {
-            $(this).addClass('collapsiblockCollapsed');
-            if (slidetype == 1) {
-              $(this.target).slideUp(slidespeed);
-            }
-            else {
-              $(this.target).animate({height:'hide', opacity:'hide'}, slidespeed);
-            }
-
-            // Don't save cookie data if the block is always collapsed.
-            if (stat != 4) {
-              st[id] = 0;
-            }
+      .wrapInner('<a href="#" role="link" />')
+      .addClass('collapsiblock')
+      .click(function (e) {
+        var st = Drupal.Collapsiblock.getCookieData();
+        if ($(this).is('.collapsiblockCollapsed')) {
+          $(this).removeClass('collapsiblockCollapsed');
+          if (slidetype == 1) {
+            $(this.target).slideDown(slidespeed).attr('aria-hidden', false); ;
           }
-          // Stringify the object in JSON format for saving in the cookie.
-          var cookieString = '{ ';
-          var cookieParts = [];
-          $.each(st, function (id, setting) {
-            cookieParts[cookieParts.length] = ' "' + id + '": ' + setting;
-          });
-          cookieString += cookieParts.join(', ') + ' }';
-          $.cookie('collapsiblock', cookieString, {path: Drupal.settings.basePath});
+          else {
+            $(this.target).animate({
+              height:'show',
+              opacity:'show'
+            }, slidespeed);
+          }
+
+          // Don't save cookie data if the block is always collapsed.
+          if (stat != 4) {
+            st[id] = 1;
+          }
+        }
+        else {
+          $(this).addClass('collapsiblockCollapsed');
+          if (slidetype == 1) {
+            $(this.target).slideUp(slidespeed).attr('aria-hidden', true);
+          }
+          else {
+            $(this.target).animate({
+              height:'hide',
+              opacity:'hide'
+            }, slidespeed);
+          }
+
+          // Don't save cookie data if the block is always collapsed.
+          if (stat != 4) {
+            st[id] = 0;
+          }
+        }
+        // Stringify the object in JSON format for saving in the cookie.
+        var cookieString = '{ ';
+        var cookieParts = [];
+        $.each(st, function (id, setting) {
+          cookieParts[cookieParts.length] = ' "' + id + '": ' + setting;
         });
+        cookieString += cookieParts.join(', ') + ' }';
+        $.cookie('collapsiblock', cookieString, {
+          path: Drupal.settings.basePath
+          });
+        e.preventDefault();
+      });
       // Leave active blocks uncollapsed. If the block is expanded, do nothing.
       if (stat ==  4 || (cookieData[id] == 0 || (stat == 3 && cookieData[id] == undefined)) && !$(this).find('a.active').size()) {
         $(titleElt).addClass('collapsiblockCollapsed');
