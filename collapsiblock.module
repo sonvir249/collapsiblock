@@ -67,7 +67,7 @@ function collapsiblock_admin_settings($form, &$form_state) {
 /**
  * Load needed files.
  */
-function collapsiblock_load($nodes) {
+function collapsiblock_load() {
   // ERROR: return statement not found in hook_load
   // TODO: Name the variable $xx_missing_xx which was missing in the old function signature.
   static $loaded = FALSE;
@@ -75,10 +75,10 @@ function collapsiblock_load($nodes) {
     global $theme;
     $current_theme = $theme ? $theme : variable_get('theme_default', 'garland');
     $collapsiblock_path = drupal_get_path('module', 'collapsiblock');
-    $theme_settings = theme_get_settings($current_theme);
+    $theme_settings = variable_get(str_replace('/', '_', 'theme_' . $current_theme . '_settings'),array());
     $theme_settings = array_merge(collapsiblock_default_settings(), $theme_settings, array());
-    jstools_add_js(drupal_get_path('module', 'collapsiblock') . '/collapsiblock.js');
-    drupal_add_js(drupal_get_path('module', 'jstools') . '/jquery.cookie.js');
+    drupal_add_js(drupal_get_path('module', 'collapsiblock') . '/collapsiblock.js',array('type'=>'file','scope'=>'footer','every_page'=>'TRUE'));
+    //drupal_add_js(drupal_get_path('module', 'jstools') . '/jquery.cookie.js');
     drupal_add_js(array(
         'collapsiblock' => array(
             'blocks' => variable_get('collapsiblock_settings', array()),
@@ -113,19 +113,10 @@ function collapsiblock_default_settings() {
 function collapsiblock_form_alter(&$form, $form_state, $form_id) {
 
   if ($form_id == 'system_theme_settings') {
-    if ($key = $form['#parameters'][2]) {
-      $settings = theme_get_settings($key);
-      $themes = system_rebuild_theme_data();
-      $features = $themes[$key]->info['features'];
-      $settings = array_merge(collapsiblock_default_settings(), $settings, array());
-    }
-    else {
-      $settings = theme_get_settings('');
-      $settings = array_merge(collapsiblock_default_settings(), $settings, array());
-    }
-
-    collapsiblock_default_settings();
-    //$settings = theme_get_settings();
+    
+    $settings = variable_get($form['var']['#value'],array());
+    $settings = array_merge(collapsiblock_default_settings(), $settings, array());
+    
     $form['collapsiblock'] = array(
         '#type' => 'fieldset',
         '#title' => t('Collapsiblock selectors'),
