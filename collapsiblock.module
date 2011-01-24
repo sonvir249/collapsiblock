@@ -7,19 +7,19 @@
  */
 
 /**
- * Implementation of hook_init().
+ * Implements hook_init().
  */
 function collapsiblock_init() {
   collapsiblock_load();
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function collapsiblock_menu() {
   $items = array();
 
-  $items['admin/settings/collapsiblock'] = array(
+  $items['admin/config/collapsiblock'] = array(
     'title' => 'Collapsiblock',
     'description' => 'Configuration for collapsible blocks',
     'page callback' => 'drupal_get_form',
@@ -33,11 +33,11 @@ function collapsiblock_menu() {
 /**
  * Admin settings.
  */
-function collapsiblock_admin_settings() {
+function collapsiblock_admin_settings($form, &$form_state) {
   $form = array();
   $form['collapsiblock_help'] = array(
     '#type' => 'item',
-    '#value' => t('Change selectors from <a href="!url">Themes configuration</a>.',array('!url'=>url('admin/build/themes/settings'))),
+    '#value' => t('Change selectors from <a href="!url">Themes configuration</a>.', array('!url' => url('admin/appearance/settings'))),
   );
 
   $form['collapsiblock_default_state'] = array(
@@ -67,16 +67,18 @@ function collapsiblock_admin_settings() {
 /**
  * Load needed files.
  */
-function collapsiblock_load() {
+function collapsiblock_load($nodes) {
+  // ERROR: return statement not found in hook_load
+  // TODO: Name the variable $xx_missing_xx which was missing in the old function signature.
   static $loaded = FALSE;
   if (!$loaded) {
     global $theme;
     $current_theme = $theme ? $theme : variable_get('theme_default', 'garland');
     $collapsiblock_path = drupal_get_path('module', 'collapsiblock');
     $theme_settings = theme_get_settings($current_theme);
-    $theme_settings = array_merge(collapsiblock_default_settings(),$theme_settings, array());
+    $theme_settings = array_merge(collapsiblock_default_settings(), $theme_settings, array());
     jstools_add_js(drupal_get_path('module', 'collapsiblock') . '/collapsiblock.js');
-    drupal_add_js(drupal_get_path('module', 'jstools') .'/jquery.cookie.js');
+    drupal_add_js(drupal_get_path('module', 'jstools') . '/jquery.cookie.js');
     drupal_add_js(array(
         'collapsiblock' => array(
             'blocks' => variable_get('collapsiblock_settings', array()),
@@ -86,9 +88,9 @@ function collapsiblock_load() {
             'block_title' => $theme_settings['collapsiblock_title'],
             'block' => $theme_settings['collapsiblock_block'],
             'block_content' => $theme_settings['collapsiblock_content'],
-            )), 'setting'
-    );
-    drupal_add_css($collapsiblock_path .'/collapsiblock.css');
+            )), array('type' => 'setting'
+    , 'scope' => JS_DEFAULT));
+    drupal_add_css($collapsiblock_path . '/collapsiblock.css');
     $loaded = TRUE;
   }
 }
@@ -105,18 +107,19 @@ function collapsiblock_default_settings() {
   return $defaults;
 }
 
- /**
- * Implementation of hook_form_alter().
+/**
+ * Implements hook_form_alter().
  */
 function collapsiblock_form_alter(&$form, $form_state, $form_id) {
- 
+
   if ($form_id == 'system_theme_settings') {
     if ($key = $form['#parameters'][2]) {
       $settings = theme_get_settings($key);
-      $themes = system_theme_data();
+      $themes = system_rebuild_theme_data();
       $features = $themes[$key]->info['features'];
       $settings = array_merge(collapsiblock_default_settings(), $settings, array());
-    } else {
+    }
+    else {
       $settings = theme_get_settings('');
       $settings = array_merge(collapsiblock_default_settings(), $settings, array());
     }
@@ -166,9 +169,15 @@ function collapsiblock_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
+/**
+ * Form submission handler for block_admin_configure().
+ *
+ * @see block_admin_configure()
+ * @see collapsiblock_form_alter()
+ */
 function collapsiblock_submit($form, &$form_state) {
   $settings = variable_get('collapsiblock_settings', array());
-  $settings['block-'. $form_state['values']['module'] .'-'. $form_state['values']['delta']] = $form_state['values']['collapse_type'];
+  $settings['block-' . $form_state['values']['module'] . '-' . $form_state['values']['delta']] = $form_state['values']['collapse_type'];
   variable_set('collapsiblock_settings', $settings);
 }
 

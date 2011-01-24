@@ -6,7 +6,7 @@
  */
 
 /**
- * Remove variables on uninstall.
+ * Implements hook_uninstall.
  */
 function collapsiblock_uninstall() {
   variable_del('collapsiblock_settings');
@@ -15,5 +15,3 @@ function collapsiblock_uninstall() {
   variable_del('collapsiblock_slide_speed');
   variable_del('collapsiblock_settings');
 }
-
-?>
