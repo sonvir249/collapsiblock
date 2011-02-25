@@ -1,4 +1,3 @@
-; $Id$
 name =  Collapsiblock
 description = Makes blocks collapsible.
 package = User interface
