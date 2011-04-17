@@ -18,7 +18,7 @@ function collapsiblock_init() {
 function collapsiblock_menu() {
   $items = array();
 
-  $items['admin/config/collapsiblock'] = array(
+  $items['admin/config/user-interface/collapsiblock'] = array(
     'title' => 'Collapsiblock',
     'description' => 'Configuration for collapsible blocks',
     'page callback' => 'drupal_get_form',
