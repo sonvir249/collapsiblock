@@ -9,7 +9,23 @@
  * Implements hook_init().
  */
 function collapsiblock_init() {
-  collapsiblock_load();
+    //load the settings
+    global $theme;
+    $current_theme = $theme ? $theme : variable_get('theme_default', 'garland');
+    $collapsiblock_path = drupal_get_path('module', 'collapsiblock');
+    $theme_settings = variable_get(str_replace('/', '_', 'theme_' . $current_theme . '_settings'), array());
+    $theme_settings = array_merge(collapsiblock_default_settings(), $theme_settings, array());
+    drupal_add_js(array(
+        'collapsiblock' => array(
+            'blocks' => variable_get('collapsiblock_settings', array()),
+            'default_state' => variable_get('collapsiblock_default_state', 1),
+            'slide_type' => variable_get('collapsiblock_slide_type', 1),
+            'slide_speed' => variable_get('collapsiblock_slide_speed', 200),
+            'block_title' => $theme_settings['collapsiblock_title'],
+            'block' => $theme_settings['collapsiblock_block'],
+            'block_content' => $theme_settings['collapsiblock_content'],
+            )), array('type' => 'setting'
+        , 'scope' => JS_DEFAULT));
 }
 
 /**
@@ -62,33 +78,6 @@ function collapsiblock_admin_settings($form, &$form_state) {
   return $form;
 }
 
-/**
- * Load needed files.
- */
-function collapsiblock_load() {
-  // ERROR: return statement not found in hook_load
-  // TODO: Name the variable $xx_missing_xx which was missing in the old function signature.
-  static $loaded = FALSE;
-  if (!$loaded) {
-    global $theme;
-    $current_theme = $theme ? $theme : variable_get('theme_default', 'garland');
-    $collapsiblock_path = drupal_get_path('module', 'collapsiblock');
-    $theme_settings = variable_get(str_replace('/', '_', 'theme_' . $current_theme . '_settings'), array());
-    $theme_settings = array_merge(collapsiblock_default_settings(), $theme_settings, array());
-    drupal_add_js(array(
-      'collapsiblock' => array(
-        'blocks' => variable_get('collapsiblock_settings', array()),
-        'default_state' => variable_get('collapsiblock_default_state', 1),
-        'slide_type' => variable_get('collapsiblock_slide_type', 1),
-        'slide_speed' => variable_get('collapsiblock_slide_speed', 200),
-        'block_title' => $theme_settings['collapsiblock_title'],
-        'block' => $theme_settings['collapsiblock_block'],
-        'block_content' => $theme_settings['collapsiblock_content'],
-        )), array('type' => 'setting'
-      , 'scope' => JS_DEFAULT));
-    $loaded = TRUE;
-  }
-}
 
 /**
  * Default theme's settings
