@@ -75,8 +75,6 @@ function collapsiblock_load() {
     $collapsiblock_path = drupal_get_path('module', 'collapsiblock');
     $theme_settings = variable_get(str_replace('/', '_', 'theme_' . $current_theme . '_settings'), array());
     $theme_settings = array_merge(collapsiblock_default_settings(), $theme_settings, array());
-    drupal_add_js(drupal_get_path('module', 'collapsiblock') . '/collapsiblock.js', array('type' => 'file', 'scope' => 'footer', 'every_page' => 'TRUE'));
-    //drupal_add_js(drupal_get_path('module', 'jstools') . '/jquery.cookie.js');
     drupal_add_js(array(
       'collapsiblock' => array(
         'blocks' => variable_get('collapsiblock_settings', array()),
@@ -88,7 +86,6 @@ function collapsiblock_load() {
         'block_content' => $theme_settings['collapsiblock_content'],
         )), array('type' => 'setting'
       , 'scope' => JS_DEFAULT));
-    drupal_add_css($collapsiblock_path . '/collapsiblock.css');
     $loaded = TRUE;
   }
 }

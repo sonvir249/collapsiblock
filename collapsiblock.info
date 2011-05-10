@@ -3,5 +3,7 @@ description = Makes blocks collapsible.
 package = User interface
 core = 7.x
 configure = admin/config/user-interface/collapsiblock
+scripts[] = collapsiblock.js
+stylesheets[all][] = collapsiblock.css
 files[] = collapsiblock.install
 files[] = collapsiblock.module
