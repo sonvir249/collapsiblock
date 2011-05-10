@@ -11,7 +11,7 @@
 function collapsiblock_init() {
     //load the settings
     global $theme;
-    $current_theme = $theme ? $theme : variable_get('theme_default', 'garland');
+    $current_theme = $theme ? $theme : variable_get('theme_default', 'bartik');
     $collapsiblock_path = drupal_get_path('module', 'collapsiblock');
     $theme_settings = variable_get(str_replace('/', '_', 'theme_' . $current_theme . '_settings'), array());
     $theme_settings = array_merge(collapsiblock_default_settings(), $theme_settings, array());
