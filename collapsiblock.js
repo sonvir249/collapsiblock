@@ -5,21 +5,21 @@
 
   Drupal.behaviors.collapsiblock = {
 
-    attach: function (context) {
+    attach: function (context,settings) {
       var cookieData = Drupal.Collapsiblock.getCookieData();
-      var slidetype = Drupal.settings.collapsiblock.slide_type;
-      var defaultState = Drupal.settings.collapsiblock.default_state;
-      var slidespeed = parseInt(Drupal.settings.collapsiblock.slide_speed);
-      var title = Drupal.settings.collapsiblock.block_title;
-      var block = Drupal.settings.collapsiblock.block;
-      var block_content = Drupal.settings.collapsiblock.block_content;
+      var slidetype = settings.collapsiblock.slide_type;
+      var defaultState = settings.collapsiblock.default_state;
+      var slidespeed = parseInt(settings.collapsiblock.slide_speed);
+      var title = settings.collapsiblock.block_title;
+      var block = settings.collapsiblock.block;
+      var block_content = settings.collapsiblock.block_content;
       $(block + ':not(.collapsiblock-processed)', context).addClass('collapsiblock-processed').each(function () {
         var id = this.id.replace(/_/g, '-');
         var titleElt = $(title, this).not($('.content :header',this));
         if (titleElt.size()) {
           titleElt = titleElt[0];
           // Status values: 1 = not collapsible, 2 = collapsible and expanded, 3 = collapsible and collapsed, 4 = always collapsed
-          var stat = Drupal.settings.collapsiblock.blocks[id] ? Drupal.settings.collapsiblock.blocks[id] : defaultState;
+          var stat = settings.collapsiblock.blocks[id] ? settings.collapsiblock.blocks[id] : defaultState;
           if (stat == 1) {
             return;
           }
@@ -72,7 +72,7 @@
             });
             cookieString += cookieParts.join(', ') + ' }';
             $.cookie('collapsiblock', cookieString, {
-              path: Drupal.settings.basePath
+              path: settings.basePath
             });
             e.preventDefault();
           });
