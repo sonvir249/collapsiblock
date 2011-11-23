@@ -157,6 +157,6 @@ function collapsiblock_form_alter(&$form, $form_state, $form_id) {
  */
 function collapsiblock_submit($form, &$form_state) {
   $settings = variable_get('collapsiblock_settings', array());
-  $settings['block-' . str_replace('_', '-', $form_state['values']['module']) . '-' . str_replace('_', '-', $form_state['values']['delta'])] = $form_state['values']['collapse_type'];
+  $settings['block-' . str_replace('_', '-', $form_state['values']['module']) . '-' . drupal_strtolower(str_replace('_', '-', $form_state['values']['delta']))] = $form_state['values']['collapse_type'];
   variable_set('collapsiblock_settings', $settings);
 }
