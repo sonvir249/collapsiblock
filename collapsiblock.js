@@ -9,7 +9,7 @@
       var cookieData = Drupal.Collapsiblock.getCookieData();
       var slidetype = settings.collapsiblock.slide_type;
       var defaultState = settings.collapsiblock.default_state;
-      var slidespeed = parseInt(settings.collapsiblock.slide_speed);
+      var slidespeed = parseInt(settings.collapsiblock.slide_speed,10);
       var title = settings.collapsiblock.block_title;
       var block = settings.collapsiblock.block;
       var block_content = settings.collapsiblock.block_content;
@@ -34,7 +34,7 @@
             if ($(this).is('.collapsiblockCollapsed')) {
               $(this).removeClass('collapsiblockCollapsed');
               if (slidetype == 1) {
-                $(this.target).slideDown(slidespeed).attr('aria-hidden', false); ;
+                $(this.target).slideDown(slidespeed).attr('aria-hidden', false);
               }
               else {
                 $(this.target).animate({
