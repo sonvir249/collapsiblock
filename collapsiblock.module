@@ -15,6 +15,7 @@ function collapsiblock_init() {
     $collapsiblock_path = drupal_get_path('module', 'collapsiblock');
     $theme_settings = variable_get(str_replace('/', '_', 'theme_' . $current_theme . '_settings'), array());
     $theme_settings = array_merge(collapsiblock_default_settings(), $theme_settings, array());
+    drupal_add_library('system', 'jquery.cookie');
     drupal_add_js(array(
         'collapsiblock' => array(
             'blocks' => variable_get('collapsiblock_settings', array()),
