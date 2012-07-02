@@ -26,9 +26,10 @@
 
           titleElt.target = $(this).find(block_content);
           $(titleElt)
-          .wrapInner('<a href="#" role="link" />')
+          .wrapInner('<a href="#' + id +'" role="link" />')
           .addClass('collapsiblock')
           .click(function (e) {
+            e.preventDefault();  
             var st = Drupal.Collapsiblock.getCookieData();
             if ($(this).is('.collapsiblockCollapsed')) {
               $(this).removeClass('collapsiblockCollapsed');
@@ -74,7 +75,6 @@
             $.cookie('collapsiblock', cookieString, {
               path: settings.basePath
             });
-            e.preventDefault();
           });
           // Leave active blocks uncollapsed. If the block is expanded, do nothing.
           if (stat ==  4 || (cookieData[id] == 0 || (stat == 3 && cookieData[id] == undefined)) && !$(this).find('a.active').size()) {
