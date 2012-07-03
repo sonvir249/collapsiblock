@@ -18,7 +18,7 @@ function collapsiblock_init() {
     drupal_add_library('system', 'jquery.cookie');
     drupal_add_js(array(
         'collapsiblock' => array(
-            'blocks' => variable_get('collapsiblock_settings', array()),
+            'blocks' => array_change_key_case(variable_get('collapsiblock_settings', array()), CASE_LOWER),
             'default_state' => variable_get('collapsiblock_default_state', 1),
             'slide_type' => variable_get('collapsiblock_slide_type', 1),
             'slide_speed' => variable_get('collapsiblock_slide_speed', 200),
