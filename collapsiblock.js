@@ -76,6 +76,9 @@
               path: settings.basePath
             });
           });
+          $('a[role=link]', titleElt).click(function (e) {
+            e.preventDefault();
+          });
           // Leave active blocks uncollapsed. If the block is expanded, do nothing.
           if (stat ==  4 || (cookieData[id] == 0 || (stat == 3 && cookieData[id] == undefined)) && !$(this).find('a.active').size()) {
             // Allow block content to assign class 'collapsiblock-force-open' to it's content to force
