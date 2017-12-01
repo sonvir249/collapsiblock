@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the devel module.
+ */
+
+use Drupal\block\Entity\Block;
+
+/**
+ * Implements hook_uninstall().
+ */
+function collapsiblock_uninstall() {
+  $blocks = Block::loadMultiple();
+  foreach ($blocks as $key => $block) {
+    if ('block-' . str_replace('_', '-', $block->get('id'))) {
+      \Drupal::configFactory()->getEditable('block.block.' . $block->get('id'))
+        ->clear('block-' . str_replace('_', '-', $block->get('id')))
+        ->save();
+    }
+  }
+  drupal_flush_all_caches();
+}
