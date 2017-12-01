@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * @file
+ * Make blocks collapsible.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\block\Entity\Block;
+
+// Default form settings.
+define('COLLAPSIBLOCK_DEFAULT_STATE', 3);
+define('COLLAPSIBLOCK_ACTIVE_PAGES', FALSE);
+define('COLLAPSIBLOCK_SLIDE_TYPE', 1);
+define('COLLAPSIBLOCK_SLIDE_SPEED', 200);
+
+// Default theme settings.
+define('COLLAPSIBLOCK_TITLE', ':header:first');
+define('COLLAPSIBLOCK_BLOCK', 'div.block');
+define('COLLAPSIBLOCK_CONTENT', 'div.content');
+
+/**
+ * Implements hook_form_alter().
+ */
+function collapsiblock_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'block_form') {
+    $global_settings = \Drupal::config('collapsiblock.global_settings');
+    $default_state = $global_settings->get('collapsiblock_default_state') ? $global_settings->get('collapsiblock_default_state') : COLLAPSIBLOCK_DEFAULT_STATE;
+    if (isset($form['id']['#default_value'])) {
+      $block = Block::load($form['id']['#default_value']);
+      if ($block) {
+        $settings['collapse_type'] = $block->get('block-' . str_replace('_', '-', $form['id']['#default_value']));
+      }
+    }
+    $form['collapsiblock_settings'] = [
+      '#type' => 'details',
+      '#title' => t('Collapsible'),
+      '#open' => TRUE,
+    ];
+    $form['collapsiblock_settings']['collapse_type'] = [
+      '#type' => 'radios',
+      '#title' => t('Block collapse behavior'),
+      '#options' => [
+        1 => t('None.'),
+        2 => t('Collapsible, expanded by default.'),
+        3 => t('Collapsible, collapsed by default.'),
+        4 => t('Collapsible, collapsed all the time.'),
+      ],
+      '#default_value' => isset($settings['collapse_type']) ? $settings['collapse_type'] : $default_state,
+    ];
+    $form['actions']['submit']['#submit'][] = 'collapsiblock_submit';
+  }
+}
+
+/**
+ * Block form submit callback.
+ */
+function collapsiblock_submit(array &$form, FormStateInterface $form_state) {
+  $settings = $form_state->getValues();
+  if (isset($form['id']['#default_value'])) {
+    // Set default values for config which require dynamic values.
+    \Drupal::configFactory()->getEditable('block.block.' . $form['id']['#default_value'])
+      ->set('block-' . str_replace('_', '-', $settings['id']), $settings['collapsiblock_settings']['collapse_type'])
+      ->save();
+  }
+}
+
+/**
+ * Implements hook_form_system_theme_settings_alter().
+ */
+function collapsiblock_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
+  $theme_name = \Drupal::theme()->getActiveTheme()->getName();
+  $form['collapsiblock'] = [
+    '#type' => 'details',
+    '#title' => t('Collapsiblock selectors'),
+    '#open' => TRUE,
+    '#description' => t("Force <a href='http://api.jquery.com/category/selectors/'>CSS selector</a> if collapsiblock doesn't work out of the box"),
+    '#weight' => 0,
+    '#attributes' => ['id' => 'collapsiblock_form'],
+  ];
+  $form['collapsiblock']['collapsiblock_block'] = [
+    '#type' => 'textfield',
+    '#title' => t('Block'),
+    '#default_value' => theme_get_setting('collapsiblock_block', $theme_name) ? theme_get_setting('collapsiblock_block', $theme_name) : COLLAPSIBLOCK_TITLE,
+  ];
+  $form['collapsiblock']['collapsiblock_title'] = [
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => theme_get_setting('collapsiblock_title', $theme_name) ? theme_get_setting('collapsiblock_title', $theme_name) : COLLAPSIBLOCK_BLOCK,
+  ];
+
+  $form['collapsiblock']['collapsiblock_content'] = [
+    '#type' => 'textfield',
+    '#title' => t('Block content'),
+    '#default_value' => theme_get_setting('collapsiblock_content', $theme_name) ? theme_get_setting('collapsiblock_content', $theme_name) : COLLAPSIBLOCK_CONTENT,
+  ];
+}
