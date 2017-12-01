@@ -66,6 +66,42 @@ function collapsiblock_submit(array &$form, FormStateInterface $form_state) {
 }
 
 /**
+ * Implements hook_page_attachments().
+ */
+function collapsiblock_page_attachments(array &$attachments) {
+  $theme_name = \Drupal::theme()->getActiveTheme()->getName();
+  $global_settings = \Drupal::config('collapsiblock.global_settings');
+  $blocks = Block::loadMultiple();
+  $collapsi_blocks = [];
+  foreach ($blocks as $key => $block) {
+    if ($block->get('block-' . str_replace('_', '-', $key))) {
+      $collapsi_blocks['block-' . str_replace('_', '-', $key)] = $block->get('block-' . str_replace('_', '-', $key));
+    }
+  }
+
+  // Form settings.
+  $default_state = $global_settings->get('collapsiblock_default_state') ? $global_settings->get('collapsiblock_default_state') : COLLAPSIBLOCK_DEFAULT_STATE;
+  $active_pages = $global_settings->get('collapsiblock_active_pages') ? $global_settings->get('collapsiblock_active_pages') : COLLAPSIBLOCK_ACTIVE_PAGES;
+  $slide_type = $global_settings->get('collapsiblock_slide_type') ? $global_settings->get('collapsiblock_slide_type') : COLLAPSIBLOCK_SLIDE_TYPE;
+  $slide_speed = $global_settings->get('collapsiblock_slide_speed') ? $global_settings->get('collapsiblock_slide_speed') : COLLAPSIBLOCK_SLIDE_SPEED;
+
+  // Theme settings.
+  $collapsiblock_title = theme_get_setting('collapsiblock_title', $theme_name) ? theme_get_setting('collapsiblock_title', $theme_name) : COLLAPSIBLOCK_TITLE;
+  $collapsiblock_block = theme_get_setting('collapsiblock_block', $theme_name) ? theme_get_setting('collapsiblock_block', $theme_name) : COLLAPSIBLOCK_BLOCK;
+  $collapsiblock_content = theme_get_setting('collapsiblock_content', $theme_name) ? theme_get_setting('collapsiblock_content', $theme_name) : COLLAPSIBLOCK_CONTENT;
+
+  $attachments['#attached']['library'][] = 'collapsiblock/collapsiblock-corescripts';
+  $attachments['#attached']['drupalSettings']['collapsiblock']['blocks'] = $collapsi_blocks;
+  $attachments['#attached']['drupalSettings']['collapsiblock']['default_state'] = $default_state;
+  $attachments['#attached']['drupalSettings']['collapsiblock']['active_pages'] = $active_pages;
+  $attachments['#attached']['drupalSettings']['collapsiblock']['slide_type'] = $slide_type;
+  $attachments['#attached']['drupalSettings']['collapsiblock']['slide_speed'] = $slide_speed;
+  $attachments['#attached']['drupalSettings']['collapsiblock']['block_title'] = $collapsiblock_title;
+  $attachments['#attached']['drupalSettings']['collapsiblock']['block'] = $collapsiblock_block;
+  $attachments['#attached']['drupalSettings']['collapsiblock']['block_content'] = $collapsiblock_content;
+}
+
+/**
  * Implements hook_form_system_theme_settings_alter().
  */
 function collapsiblock_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
