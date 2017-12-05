@@ -12,7 +12,6 @@
   Drupal.behaviors.collapsiblock = {
 
     attach: function (context, settings) {
-      var undefined = 'undefined';
       var cookieData = Drupal.Collapsiblock.getCookieData();
       var slidetype = settings.collapsiblock.slide_type;
       var defaultState = settings.collapsiblock.default_state;
@@ -89,7 +88,7 @@
           });
           // Leave active blocks if Remember collapsed on active pages is false.
           // If the block is expanded, do nothing.
-          if (stat === 4 || (cookieData[id] === 0 || (stat === 3 && cookieData[id] === undefined))) {
+          if (stat === 4 || (cookieData[id] === 0 || (stat === 3 && cookieData[id] === 'undefined'))) {
             if (!$(this).find('a.active').size() || activePages === 1) {
               // Allow block content to assign class 'collapsiblock-force-open'
               // to it's content to force itself to stay open. E.g. useful if
