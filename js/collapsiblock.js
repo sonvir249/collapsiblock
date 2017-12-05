@@ -2,13 +2,14 @@
  * @file
  * Contains Collapsiblock code.
  */
-(function($, Drupal, drupalSettings) {
+
+(function ($, Drupal, drupalSettings) {
 
   Drupal.Collapsiblock = Drupal.Collapsiblock || {};
 
   Drupal.behaviors.collapsiblock = {
 
-    attach: function(context, settings) {
+    attach: function (context, settings) {
       var cookieData = Drupal.Collapsiblock.getCookieData();
       var slidetype = settings.collapsiblock.slide_type;
       var defaultState = settings.collapsiblock.default_state;
@@ -17,7 +18,7 @@
       var title = settings.collapsiblock.block_title;
       var block = settings.collapsiblock.block;
       var block_content = settings.collapsiblock.block_content;
-      $(block + ':not(.collapsiblock-processed)', context).addClass('collapsiblock-processed').each(function() {
+      $(block + ':not(.collapsiblock-processed)', context).addClass('collapsiblock-processed').each(function () {
         var id = this.id.replace(/_/g, '-');
         var titleElt = $(title, this).not($('.content :header', this));
         if (titleElt.length) {
@@ -32,14 +33,15 @@
           $(titleElt)
           .wrapInner('<a href="#' + id + '" role="link" />')
           .addClass('collapsiblock')
-          .click(function(e) {
+          .click(function (e) {
             e.preventDefault();
             var st = Drupal.Collapsiblock.getCookieData();
             if ($(this).is('.collapsiblockCollapsed')) {
               $(this).removeClass('collapsiblockCollapsed');
               if (slidetype == 1) {
                 $(this.target).slideDown(slidespeed).attr('aria-hidden', false);
-              } else {
+              }
+              else {
                 $(this.target).animate({
                   height: 'show',
                   opacity: 'show'
@@ -50,11 +52,13 @@
               if (stat != 4) {
                 st[id] = 1;
               }
-            } else {
+            }
+            else {
               $(this).addClass('collapsiblockCollapsed');
               if (slidetype == 1) {
                 $(this.target).slideUp(slidespeed).attr('aria-hidden', true);
-              } else {
+              }
+              else {
                 $(this.target).animate({
                   height: 'hide',
                   opacity: 'hide'
@@ -69,7 +73,7 @@
             // Stringify the object in JSON format for saving in the cookie.
             var cookieString = '{ ';
             var cookieParts = [];
-            $.each(st, function(id, setting) {
+            $.each(st, function (id, setting) {
               cookieParts[cookieParts.length] = ' "' + id + '": ' + setting;
             });
             cookieString += cookieParts.join(', ') + ' }';
@@ -77,7 +81,7 @@
               path: settings.basePath
             });
           });
-          $('a[role=link]', titleElt).click(function(e) {
+          $('a[role=link]', titleElt).click(function (e) {
             e.preventDefault();
           });
           // Leave active blocks if Remember collapsed on active pages is false.
@@ -101,11 +105,12 @@
 
   };
 
-  Drupal.Collapsiblock.getCookieData = function() {
+  Drupal.Collapsiblock.getCookieData = function () {
     if ($.cookie) {
       var cookieString = $.cookie('collapsiblock');
       return cookieString ? $.parseJSON(cookieString) : {};
-    } else {
+    }
+    else {
       return '';
     }
   };
