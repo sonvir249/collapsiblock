@@ -8,48 +8,36 @@
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\block\Entity\Block;
 
-// Default form settings.
-define('COLLAPSIBLOCK_DEFAULT_STATE', 3);
-define('COLLAPSIBLOCK_ACTIVE_PAGES', FALSE);
-define('COLLAPSIBLOCK_SLIDE_TYPE', 1);
-define('COLLAPSIBLOCK_SLIDE_SPEED', 200);
-
-// Default theme settings.
-define('COLLAPSIBLOCK_TITLE', ':header:first');
-define('COLLAPSIBLOCK_BLOCK', 'div.block');
-define('COLLAPSIBLOCK_CONTENT', 'div.content');
-
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_FORM_ID_alter().
  */
-function collapsiblock_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
-  if ($form_id == 'block_form') {
-    $global_settings = \Drupal::config('collapsiblock.global_settings');
-    $default_state = $global_settings->get('collapsiblock_default_state') ? $global_settings->get('collapsiblock_default_state') : COLLAPSIBLOCK_DEFAULT_STATE;
-    if (isset($form['id']['#default_value'])) {
-      $block = Block::load($form['id']['#default_value']);
-      if ($block) {
-        $settings['collapse_type'] = $block->get('block-' . str_replace('_', '-', $form['id']['#default_value']));
-      }
+function collapsiblock_form_block_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $default_config = \Drupal::config('collapsiblock.settings');
+  if (!empty($form['id']['#default_value'])) {
+    $block = Block::load($form['id']['#default_value']);
+    if ($block) {
+      $default_state = $block->get('collapsiblock');
+      $settings['collapse_type'] = $default_state['block-' . str_replace('_', '-', $block->get('id'))];
     }
-    $form['collapsiblock_settings'] = [
-      '#type' => 'details',
-      '#title' => t('Collapsible'),
-      '#open' => TRUE,
-    ];
-    $form['collapsiblock_settings']['collapse_type'] = [
-      '#type' => 'radios',
-      '#title' => t('Block collapse behavior'),
-      '#options' => [
-        1 => t('None.'),
-        2 => t('Collapsible, expanded by default.'),
-        3 => t('Collapsible, collapsed by default.'),
-        4 => t('Collapsible, collapsed all the time.'),
-      ],
-      '#default_value' => isset($settings['collapse_type']) ? $settings['collapse_type'] : $default_state,
-    ];
-    $form['actions']['submit']['#submit'][] = 'collapsiblock_submit';
   }
+
+  $form['collapsiblock_settings'] = [
+    '#type' => 'details',
+    '#title' => t('Collapsible'),
+    '#open' => TRUE,
+  ];
+  $form['collapsiblock_settings']['collapse_type'] = [
+    '#type' => 'radios',
+    '#title' => t('Block collapse behavior'),
+    '#options' => [
+      1 => t('None.'),
+      2 => t('Collapsible, expanded by default.'),
+      3 => t('Collapsible, collapsed by default.'),
+      4 => t('Collapsible, collapsed all the time.'),
+    ],
+    '#default_value' => !empty($settings['collapse_type']) ? $settings['collapse_type'] : $default_config->get('default_state'),
+  ];
+  $form['actions']['submit']['#submit'][] = 'collapsiblock_submit';
 }
 
 /**
@@ -57,10 +45,10 @@ function collapsiblock_form_alter(array &$form, FormStateInterface $form_state, 
  */
 function collapsiblock_submit(array &$form, FormStateInterface $form_state) {
   $settings = $form_state->getValues();
-  if (isset($form['id']['#default_value'])) {
+  if (!empty($form['id']['#default_value'])) {
     // Set default values for config which require dynamic values.
     \Drupal::configFactory()->getEditable('block.block.' . $form['id']['#default_value'])
-      ->set('block-' . str_replace('_', '-', $settings['id']), $settings['collapsiblock_settings']['collapse_type'])
+      ->set('collapsiblock.block-' . str_replace('_', '-', $settings['id']), $settings['collapsiblock_settings']['collapse_type'])
       ->save();
   }
 }
@@ -69,43 +57,47 @@ function collapsiblock_submit(array &$form, FormStateInterface $form_state) {
  * Implements hook_page_attachments().
  */
 function collapsiblock_page_attachments(array &$attachments) {
+  $default_config = \Drupal::config('collapsiblock.settings');
   $theme_name = \Drupal::theme()->getActiveTheme()->getName();
-  $global_settings = \Drupal::config('collapsiblock.global_settings');
-  $blocks = Block::loadMultiple();
-  $collapsi_blocks = [];
-  foreach ($blocks as $key => $block) {
-    if ($block->get('block-' . str_replace('_', '-', $key))) {
-      $collapsi_blocks['block-' . str_replace('_', '-', $key)] = $block->get('block-' . str_replace('_', '-', $key));
-    }
-  }
-
-  // Form settings.
-  $default_state = $global_settings->get('collapsiblock_default_state') ? $global_settings->get('collapsiblock_default_state') : COLLAPSIBLOCK_DEFAULT_STATE;
-  $active_pages = $global_settings->get('collapsiblock_active_pages') ? $global_settings->get('collapsiblock_active_pages') : COLLAPSIBLOCK_ACTIVE_PAGES;
-  $slide_type = $global_settings->get('collapsiblock_slide_type') ? $global_settings->get('collapsiblock_slide_type') : COLLAPSIBLOCK_SLIDE_TYPE;
-  $slide_speed = $global_settings->get('collapsiblock_slide_speed') ? $global_settings->get('collapsiblock_slide_speed') : COLLAPSIBLOCK_SLIDE_SPEED;
 
   // Theme settings.
-  $collapsiblock_title = theme_get_setting('collapsiblock_title', $theme_name) ? theme_get_setting('collapsiblock_title', $theme_name) : COLLAPSIBLOCK_TITLE;
-  $collapsiblock_block = theme_get_setting('collapsiblock_block', $theme_name) ? theme_get_setting('collapsiblock_block', $theme_name) : COLLAPSIBLOCK_BLOCK;
-  $collapsiblock_content = theme_get_setting('collapsiblock_content', $theme_name) ? theme_get_setting('collapsiblock_content', $theme_name) : COLLAPSIBLOCK_CONTENT;
+  $collapsiblock_title = !empty(theme_get_setting('title', $theme_name)) ? theme_get_setting('title', $theme_name) : $default_config->get('title');
+  $collapsiblock_block = !empty(theme_get_setting('block', $theme_name)) ? theme_get_setting('block', $theme_name) : $default_config->get('block');
+  $collapsiblock_content = !empty(theme_get_setting('content', $theme_name)) ? theme_get_setting('content', $theme_name) : $default_config->get('content');
 
-  $attachments['#attached']['library'][] = 'collapsiblock/collapsiblock-corescripts';
-  $attachments['#attached']['drupalSettings']['collapsiblock']['blocks'] = $collapsi_blocks;
-  $attachments['#attached']['drupalSettings']['collapsiblock']['default_state'] = $default_state;
-  $attachments['#attached']['drupalSettings']['collapsiblock']['active_pages'] = $active_pages;
-  $attachments['#attached']['drupalSettings']['collapsiblock']['slide_type'] = $slide_type;
-  $attachments['#attached']['drupalSettings']['collapsiblock']['slide_speed'] = $slide_speed;
-  $attachments['#attached']['drupalSettings']['collapsiblock']['block_title'] = $collapsiblock_title;
-  $attachments['#attached']['drupalSettings']['collapsiblock']['block'] = $collapsiblock_block;
-  $attachments['#attached']['drupalSettings']['collapsiblock']['block_content'] = $collapsiblock_content;
+  // Load all blocks.
+  $blocks = Block::loadMultiple();
+  if (!empty($blocks)) {
+    $collapsi_blocks = [];
+    foreach ($blocks as $key => $block) {
+      if (!empty($block->get('collapsiblock'))) {
+        $collapsi_blocks['collapsiblock.block-' . str_replace('_', '-', $key)] = $block->get('collapsiblock.block-' . str_replace('_', '-', $key));
+      }
+    }
+
+    // Add block settings for js.
+    $attachments['#attached']['drupalSettings']['collapsiblock']['blocks'] = $collapsi_blocks;
+    $attachments['#attached']['drupalSettings']['collapsiblock']['default_state'] = $default_config->get('default_state');
+    $attachments['#attached']['drupalSettings']['collapsiblock']['active_pages'] = $default_config->get('active_pages');
+    $attachments['#attached']['drupalSettings']['collapsiblock']['slide_type'] = $default_config->get('slide_type');
+    $attachments['#attached']['drupalSettings']['collapsiblock']['slide_speed'] = $default_config->get('slide_speed');
+    $attachments['#attached']['drupalSettings']['collapsiblock']['block_title'] = $collapsiblock_title;
+    $attachments['#attached']['drupalSettings']['collapsiblock']['block'] = $collapsiblock_block;
+    $attachments['#attached']['drupalSettings']['collapsiblock']['block_content'] = $collapsiblock_content;
+
+    // Load css and js libraries.
+    $attachments['#attached']['library'][] = 'collapsiblock/corescripts';
+  }
 }
 
 /**
  * Implements hook_form_system_theme_settings_alter().
  */
 function collapsiblock_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
+  $default_config = \Drupal::config('collapsiblock.settings');
   $theme_name = \Drupal::theme()->getActiveTheme()->getName();
+
+  // Add new fields for default settings.
   $form['collapsiblock'] = [
     '#type' => 'details',
     '#title' => t('Collapsiblock selectors'),
@@ -117,17 +109,17 @@ function collapsiblock_form_system_theme_settings_alter(&$form, FormStateInterfa
   $form['collapsiblock']['collapsiblock_block'] = [
     '#type' => 'textfield',
     '#title' => t('Block'),
-    '#default_value' => theme_get_setting('collapsiblock_block', $theme_name) ? theme_get_setting('collapsiblock_block', $theme_name) : COLLAPSIBLOCK_TITLE,
+    '#default_value' => !empty(theme_get_setting('collapsiblock_block', $theme_name)) ? theme_get_setting('collapsiblock_block', $theme_name) : $default_config->get('title'),
   ];
   $form['collapsiblock']['collapsiblock_title'] = [
     '#type' => 'textfield',
     '#title' => t('Title'),
-    '#default_value' => theme_get_setting('collapsiblock_title', $theme_name) ? theme_get_setting('collapsiblock_title', $theme_name) : COLLAPSIBLOCK_BLOCK,
+    '#default_value' => !empty(theme_get_setting('collapsiblock_title', $theme_name)) ? theme_get_setting('collapsiblock_title', $theme_name) : $default_config->get('block'),
   ];
 
   $form['collapsiblock']['collapsiblock_content'] = [
     '#type' => 'textfield',
     '#title' => t('Block content'),
-    '#default_value' => theme_get_setting('collapsiblock_content', $theme_name) ? theme_get_setting('collapsiblock_content', $theme_name) : COLLAPSIBLOCK_CONTENT,
+    '#default_value' => !empty(theme_get_setting('collapsiblock_content', $theme_name)) ? theme_get_setting('collapsiblock_content', $theme_name) : $default_config->get('content'),
   ];
 }
