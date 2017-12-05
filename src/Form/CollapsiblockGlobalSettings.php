@@ -54,7 +54,7 @@ class CollapsiblockGlobalSettings extends ConfigFormBase {
       '#type' => 'radios',
       '#title' => $this->t('Default animation type'),
       '#options' => [1 => $this->t('Slide'), 2 => $this->t('Fade and slide')],
-      '#description' => t('Slide is the Drupal default while Fade and slide adds a nice fade effect.'),
+      '#description' => $this->t('Slide is the Drupal default while Fade and slide adds a nice fade effect.'),
       '#default_value' => $config->get('slide_type'),
     ];
     $form['collapsiblock_slide_speed'] = [
@@ -79,13 +79,6 @@ class CollapsiblockGlobalSettings extends ConfigFormBase {
       '#markup' => $this->t('If collapsiblock doesn\'t work out of the box, you can force CSS selectors on <a href="adadad">appearance settings</a>.'),
     ];
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
   }
 
   /**

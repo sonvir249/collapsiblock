@@ -8,4 +8,4 @@ corescripts:
     - core/jquery
     - core/jquery.cookie
     - core/drupalSettings
-
+    - core/drupal
