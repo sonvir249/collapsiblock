@@ -13,9 +13,9 @@ use Drupal\block\Entity\Block;
 function collapsiblock_uninstall() {
   $blocks = Block::loadMultiple();
   foreach ($blocks as $key => $block) {
-    if ('block-' . str_replace('_', '-', $block->get('id'))) {
+    if (!empty($block->get('collapsiblock'))) {
       \Drupal::configFactory()->getEditable('block.block.' . $block->get('id'))
-        ->clear('block-' . str_replace('_', '-', $block->get('id')))
+        ->clear('collapsiblock')
         ->save();
     }
   }

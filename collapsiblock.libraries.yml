@@ -1,4 +1,4 @@
-collapsiblock-corescripts:
+corescripts:
   css:
     theme:
       css/collapsiblock.css: {}
@@ -8,3 +8,4 @@ collapsiblock-corescripts:
     - core/jquery
     - core/jquery.cookie
     - core/drupalSettings
+

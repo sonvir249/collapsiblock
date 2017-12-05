@@ -1,4 +1,4 @@
-div .collapsiblock{
+div .collapsiblock {
   background: url(../images/expanded.png) no-repeat right;
   display: block;
 }
@@ -8,9 +8,10 @@ div .collapsiblockCollapsed {
 }
 
 .collapsiblock {
-    cursor: pointer;
-    color: #0071B3;
+  cursor: pointer;
+  color: #0071b3;
 }
+
 .collapsiblock:hover {
   color: #018fe2;;
 }
